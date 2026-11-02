@@ -135,7 +135,6 @@ async function main() {
       id,
       title: row.common_name || prev.title || row.vernacular,
       date: prev.date ?? '2026-04-25',
-      author: prev.author ?? '',
       site_name: row.site_name,
       location: row.location,
       latitude: num(row.latitude),
