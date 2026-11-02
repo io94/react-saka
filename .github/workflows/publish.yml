@@ -38,13 +38,39 @@ jobs:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_TARGET_DIR: ${{ secrets.SSH_TARGET_DIR }}
         run: |
+          echo "::group::Pre-flight checks"
+          echo "SSH_HOST set:        ${SSH_HOST:+yes}"
+          echo "SSH_PORT:            ${SSH_PORT:-(empty!)}"
+          echo "SSH_USER set:        ${SSH_USER:+yes}"
+          echo "SSH_TARGET_DIR:      ${SSH_TARGET_DIR:-(empty!)}"
+          echo "SSH_PRIVATE_KEY len: ${#SSH_PRIVATE_KEY}"
+          echo "dist/ exists:        $([ -d ./dist ] && echo yes || echo NO)"
+          ls -la ./dist | head -n 20
+          echo "::endgroup::"
+
+          echo "::group::Write key + known_hosts"
           mkdir -p ~/.ssh
           printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          # don't let a keyscan hiccup kill the step via `set -e`
+          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+          if [ -s ~/.ssh/known_hosts ]; then
+            echo "known_hosts: $(wc -l < ~/.ssh/known_hosts) line(s) collected"
+          else
+            echo "WARNING: known_hosts is EMPTY — host unreachable? check SSH_HOST/SSH_PORT/firewall"
+          fi
+          echo "::endgroup::"
+
+          echo "::group::SSH auth test"
+          ssh -i ~/.ssh/deploy_key -p "$SSH_PORT" -o BatchMode=yes \
+            "$SSH_USER@$SSH_HOST" 'echo SSH_OK && whoami && pwd && ls -la "'"$SSH_TARGET_DIR"'"'
+          echo "::endgroup::"
+
+          echo "::group::rsync deploy"
           rsync -rlvz --delete \
             --exclude='.well-known' \
             --exclude='.htaccess' \
             --exclude='.ftpquota' \
             -e "ssh -i ~/.ssh/deploy_key -p $SSH_PORT" \
             ./dist/ "$SSH_USER@$SSH_HOST:$SSH_TARGET_DIR"
+          echo "::endgroup::"
