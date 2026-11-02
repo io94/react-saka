@@ -9,6 +9,9 @@ concurrency:
   group: publish
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
@@ -30,33 +33,17 @@ jobs:
       - name: Build static site
         run: npm run build
 
-      - name: Deploy to cPanel over SSH (rsync)
+      - name: Package build
+        run: tar -czf site.tar.gz -C dist .
+
+      - name: Publish build to 'live' release (server pulls this)
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_TARGET_DIR: ${{ secrets.SSH_TARGET_DIR }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p ~/.ssh
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          # strip stray whitespace / carriage returns that sneak into secrets
-          SSH_HOST="$(printf '%s' "$SSH_HOST" | tr -d '\r' | xargs)"
-          SSH_PORT="$(printf '%s' "$SSH_PORT" | tr -d '\r' | xargs)"
-          SSH_USER="$(printf '%s' "$SSH_USER" | tr -d '\r' | xargs)"
-          SSH_TARGET_DIR="$(printf '%s' "$SSH_TARGET_DIR" | tr -d '\r' | xargs)"
-          # TEMP DEBUG: reveal host/port past GitHub's secret masking (remove later)
-          echo "DEBUG host chars: $(printf '%s' "$SSH_HOST" | sed 's/./& /g')"
-          echo "DEBUG host len:   ${#SSH_HOST}"
-          echo "DEBUG port chars: $(printf '%s' "$SSH_PORT" | sed 's/./& /g')"
-          echo "DEBUG port len:   ${#SSH_PORT}"
-          echo "DEBUG user len:   ${#SSH_USER}"
-          echo "DEBUG target:     $(printf '%s' "$SSH_TARGET_DIR" | sed 's/./& /g')"
-          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts || true
-          rsync -rlvz --delete \
-            --exclude='.well-known' \
-            --exclude='.htaccess' \
-            --exclude='.ftpquota' \
-            -e "ssh -i ~/.ssh/deploy_key -p $SSH_PORT" \
-            ./dist/ "$SSH_USER@$SSH_HOST:$SSH_TARGET_DIR"
+          # Create the rolling release once; ignore error if it already exists
+          gh release create live \
+            --title "Latest production build" \
+            --notes "Rolling build pulled by the cPanel server. Updated automatically." \
+            2>/dev/null || true
+          # Replace the asset with the fresh build
+          gh release upload live site.tar.gz --clobber
