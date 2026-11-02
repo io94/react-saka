@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: 'Roboto';
+    -webkit-font-smoothing: antialiased;
+    background-color: #ffffff;
+    color: #191919;
+  }
+  #root {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@layer components {
+  .tag-pill {
+    @apply inline-block px-3 py-1 rounded-full text-xs font-sans font-medium uppercase tracking-wider transition-colors cursor-pointer;
+  }
+}
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+}
