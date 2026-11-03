@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
-import { getTreeById, getTreeMeta } from '../data/trees.js'
+import { getTreeById } from '../data/trees.js'
+import { getTreeWriteup } from '../data/writeups.js'
 import { useUnitSystem, formatMeasurement } from '../hooks/useUnitSystem.js'
+import Markdown from '../components/Markdown.jsx'
 
 const PLACEHOLDER = '/saka-logo.svg'
 
@@ -116,11 +118,12 @@ export default function TreeDetail() {
       [...(tree.images || []), tree.image_2013, tree.image_2025, tree.image].filter(Boolean),
     ),
   ]
-  const meta = getTreeMeta(tree.id)
-  const paragraphs = meta?.body
-    ? meta.body.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean)
+  const writeup = getTreeWriteup(tree.id)
+  const isMarkdown = Boolean(writeup?.isMarkdown)
+  const paragraphs = !isMarkdown && writeup?.body
+    ? writeup.body.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean)
     : null
-  const figureMap = figureBlocksByParagraph(meta?.figures)
+  const figureMap = figureBlocksByParagraph(isMarkdown ? [] : writeup?.figures)
   const paraCount = paragraphs?.length ?? 0
   const trailingBlocks = []
   figureMap.forEach((blocks, key) => {
@@ -257,7 +260,9 @@ export default function TreeDetail() {
       <div className="max-w-4xl mx-auto px-6 pb-16 border-t border-sand-200 pt-10">
         <section>
           <h2 className="text-forest-800 font-bold text-2xl mb-6">About this tree</h2>
-          {paragraphs ? (
+          {isMarkdown ? (
+            <Markdown>{writeup.body}</Markdown>
+          ) : paragraphs ? (
             <div>
               {paragraphs.map((p, i) => {
                 const blocks = figureMap.get(i) || []

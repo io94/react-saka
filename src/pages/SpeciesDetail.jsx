@@ -1,6 +1,7 @@
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { getSpeciesBySlug } from '../data/species.js'
 import { formatSites } from '../data/trees.js'
+import Markdown from '../components/Markdown.jsx'
 
 const PLACEHOLDER = '/saka-logo.svg'
 
@@ -79,7 +80,9 @@ export default function SpeciesDetail() {
 
         <div className="lg:col-span-2">
           <h2 className="text-forest-800 font-bold text-2xl mb-4">About this species</h2>
-          {paragraphs.length > 0 ? (
+          {item.isMarkdown ? (
+            <Markdown>{item.body}</Markdown>
+          ) : paragraphs.length > 0 ? (
             <div className="flex flex-col gap-5">
               {paragraphs.map((p, i) => (
                 <p key={i} className="text-bark-600 text-lg leading-relaxed">{p}</p>

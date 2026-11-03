@@ -1,5 +1,7 @@
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { getTopicBySlug, getTreesForTopic } from '../data/topics.js'
+import { getTopicWriteup } from '../data/writeups.js'
+import Markdown from '../components/Markdown.jsx'
 
 // Vary tag font size by index to mimic a word cloud feel
 const TAG_SIZES = ['text-2xl', 'text-lg', 'text-base', 'text-xl', 'text-sm', 'text-lg', 'text-2xl', 'text-base', 'text-xl', 'text-sm']
@@ -38,6 +40,7 @@ export default function TopicDetail() {
   if (!topic) return <Navigate to="/topics" replace />
 
   const matchedTrees = getTreesForTopic(topic)
+  const description = getTopicWriteup(slug)
 
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -75,6 +78,12 @@ export default function TopicDetail() {
         </div>
       </div>
 
+
+      {description && (
+        <div className="max-w-4xl mx-auto px-6 pt-4 pb-2">
+          <Markdown>{description}</Markdown>
+        </div>
+      )}
 
       {/* Gallery grid */}
       <div className="max-w-5xl mx-auto px-6 pb-16">

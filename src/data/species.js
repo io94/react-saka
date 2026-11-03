@@ -1,14 +1,5 @@
 import { allTrees } from './trees.js'
-
-const VERNACULAR_ALIAS = {
-  'Nyamplung / Camplung': 'Camplung',
-  'beringin (Kuwang)': 'Kuwang',
-  'Asam / Celagi': 'Asam',
-  Asem: 'Asam',
-  'randu alas': 'Randu Alas',
-  'Kepal/Kepel': 'Kepel',
-  'Rambutan Jantan': 'Rambutan',
-}
+import { SPECIES_WRITEUPS, VERNACULAR_ALIAS } from './writeups.generated.js'
 
 const slugify = (name) =>
   name
@@ -71,15 +62,18 @@ function buildSpecies() {
   for (const [name, trees] of groups) {
     const slug = slugify(name)
     const meta = SPECIES_META[slug] || {}
+    const docBody = SPECIES_WRITEUPS[slug]?.body || null
     const heroFromTree = trees.find((t) => t.image)?.image || null
     list.push({
       slug,
       name,
       scientific: meta.scientific || deriveScientific(trees),
       image: meta.image || heroFromTree,
-      body: meta.body || null,
-      figures: meta.figures || [],
-      hasWriteup: Boolean(meta.body),
+      // Doc write-up wins (Markdown, inline figures); else legacy meta prose + sidebar figures.
+      body: docBody || meta.body || null,
+      isMarkdown: Boolean(docBody),
+      figures: docBody ? [] : meta.figures || [],
+      hasWriteup: Boolean(docBody || meta.body),
       trees,
       treeCount: trees.length,
     })
