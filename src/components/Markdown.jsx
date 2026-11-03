@@ -9,9 +9,21 @@ const components = {
     }
     return <p className="text-bark-600 text-lg leading-relaxed mb-5">{children}</p>
   },
-  img({ src, alt }) {
+  // Placement rides in the image title, set by the sync from the Doc:
+  //   "group"       → side-by-side (from a 1-row table of images)
+  //   "float-right" / "float-left" → text wraps around it (Docs "Wrap text")
+  //   (none)        → full-width block
+  img({ src, alt, title }) {
+    const t = title || ''
+    const cls = t.includes('group')
+      ? 'inline-block w-[31%] align-top mx-[1%] mb-4'
+      : t.includes('float-right')
+        ? 'sm:float-right sm:w-2/5 sm:ml-6 mb-4'
+        : t.includes('float-left')
+          ? 'sm:float-left sm:w-2/5 sm:mr-6 mb-4'
+          : 'my-6'
     return (
-      <figure className="my-6 border border-sand-200 bg-sand-50">
+      <figure className={`${cls} border border-sand-200 bg-sand-50`}>
         <img src={src} alt={alt || ''} className="w-full object-contain bg-white" />
         {alt && (
           <figcaption className="text-bark-400 text-xs italic text-center leading-snug px-3 py-2 border-t border-sand-200">
@@ -43,6 +55,7 @@ export default function Markdown({ children }) {
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
         {children}
       </ReactMarkdown>
+      <div className="clear-both" />
     </div>
   )
 }

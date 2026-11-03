@@ -1,8 +1,4 @@
-// AUTO-SYNC write-ups: Google Docs -> Markdown + figures, Team/Resources tabs -> data.
-// Standalone from build_from_google.mjs on purpose:
-//   - Doc figures live under public/images/writeups/ so the photo sync's pruning
-//     (which owns public/images/trees/) never deletes them.
-//   - A failure here can't corrupt the working biometrics sync.
+// AUTO-SYNC write-ups (standalone)
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -18,7 +14,7 @@ const KEY =
 const SHEET_ID = '1w-BNQ2QL8kDA5YDB-lcgRV_a5qzU0N97aONyR7-wi9s'
 
 const OUT_JS = path.join(APP, 'src', 'data', 'writeups.generated.js')
-const IMG_ROOT = path.join(APP, 'public', 'images', 'writeups') // trees/ species/ topics/ pages/
+const IMG_ROOT = path.join(APP, 'public', 'images', 'writeups') 
 const IMG_URL_BASE = '/images/writeups'
 
 const auth = new google.auth.GoogleAuth({
@@ -96,13 +92,77 @@ const HEADING_PREFIX = {
   TITLE: '# ', SUBTITLE: '## ',
 }
 
+// A wrapped image's float side, from its horizontal offset vs. the page content width.
+function floatSide(doc, po) {
+  const ds = doc.documentStyle || {}
+  const contentW =
+    (ds.pageSize?.width?.magnitude || 612) -
+    (ds.marginLeft?.magnitude || 72) -
+    (ds.marginRight?.magnitude || 72)
+  const pos = po.positionedObjectProperties?.positioning || {}
+  const left = pos.leftOffset?.magnitude || 0
+  const w = po.positionedObjectProperties?.embeddedObject?.size?.width?.magnitude || 0
+  return left + w / 2 >= contentW / 2 ? 'right' : 'left'
+}
+
+// One table cell has its image + caption (side-by-side display).
+function cellImageAndCaption(cell, inlineObjects) {
+  let uri = null
+  let italicCaption = ''
+  let anyText = ''
+  for (const ce of cell.content || []) {
+    const para = ce.paragraph
+    if (!para) continue
+    let text = ''
+    let allItalic = true
+    let had = false
+    for (const pe of para.elements || []) {
+      if (pe.inlineObjectElement) {
+        const io = inlineObjects[pe.inlineObjectElement.inlineObjectId]
+        const u = io?.inlineObjectProperties?.embeddedObject?.imageProperties?.contentUri
+        if (u) uri = u
+      } else if (pe.textRun) {
+        const c = (pe.textRun.content || '').replace(/\n/g, '')
+        if (!c) continue
+        had = true
+        if (!pe.textRun.textStyle?.italic) allItalic = false
+        text += c
+      }
+    }
+    if (had) {
+      if (allItalic && !italicCaption) italicCaption = text.trim()
+      if (!anyText) anyText = text.trim()
+    }
+  }
+  return { uri, caption: italicCaption || anyText }
+}
+
 function docToBlocks(doc) {
   const content = doc.body?.content || []
   const inlineObjects = doc.inlineObjects || {}
+  const positioned = doc.positionedObjects || {}
   const blocks = []
   for (const el of content) {
+    // Setup a table of images → 
+    if (el.table) {
+      for (const row of el.table.tableRows || []) {
+        for (const cell of row.tableCells || []) {
+          const { uri, caption } = cellImageAndCaption(cell, inlineObjects)
+          if (uri) blocks.push({ type: 'image', uri, group: true, caption })
+        }
+      }
+      continue
+    }
     const p = el.paragraph
     if (!p) continue
+    for (const poId of p.positionedObjectIds || []) {
+      const po = positioned[poId]
+      const uri = po?.positionedObjectProperties?.embeddedObject?.imageProperties?.contentUri
+      if (!uri) continue
+      const layout = po.positionedObjectProperties?.positioning?.layout
+      const floatable = layout === 'WRAP_TEXT' || layout === 'BREAK_LEFT' || layout === 'BREAK_RIGHT'
+      blocks.push({ type: 'image', uri, float: floatable ? floatSide(doc, po) : null })
+    }
     const named = p.paragraphStyle?.namedStyleType || 'NORMAL_TEXT'
     let md = ''
     let plain = ''
@@ -147,7 +207,7 @@ function docToBlocks(doc) {
   return blocks
 }
 
-// A Doc counts as written only if it has real prose
+// A Doc counts as written only if it has real content
 function hasRealContent(blocks) {
   return blocks.some(
     (b) =>
@@ -175,26 +235,40 @@ async function downloadFigure(uri, kind, slug, n) {
 }
 
 async function blocksToMarkdown(blocks, kind, slug) {
+  let lastImg = null
+  for (const b of blocks) {
+    if (b.type === 'image') {
+      if (!b.caption) b.caption = '' 
+      lastImg = b
+      continue
+    }
+    if (b.type !== 'para') continue
+    if (b.isMarker) {
+      b.consumed = true
+      continue
+    }
+    if (b.italicOnly && !b.heading && lastImg && !lastImg.caption) {
+      lastImg.caption = b.plain.replace(/\s+/g, ' ').trim()
+      b.consumed = true
+      lastImg = null
+    }
+  }
+
   const lines = []
   let figN = 0
-  for (let i = 0; i < blocks.length; i++) {
-    const b = blocks[i]
-    if (b.type === 'para' && b.isMarker) continue 
+  for (const b of blocks) {
     if (b.type === 'image') {
-      let caption = ''
-      const next = blocks[i + 1]
-      if (next && next.type === 'para' && next.italicOnly) {
-        caption = next.plain.replace(/\s+/g, ' ').trim()
-        i++ 
-      }
       try {
         const src = await downloadFigure(b.uri, kind, slug, ++figN)
-        lines.push(`![${caption.replace(/[\[\]]/g, '')}](${src})`)
+        const hint = b.group ? 'group' : b.float ? `float-${b.float}` : ''
+        const title = hint ? ` "${hint}"` : ''
+        lines.push(`![${(b.caption || '').replace(/[\[\]]/g, '')}](${src}${title})`)
       } catch (e) {
         console.warn(`   figure skipped (${kind}/${slug}): ${e.message}`)
       }
       continue
     }
+    if (b.consumed || b.isMarker) continue
     if (b.heading) lines.push(b.heading + b.md)
     else if (b.bullet) lines.push('- ' + b.md)
     else lines.push(b.md)
@@ -279,7 +353,7 @@ async function main() {
     if (variant && canonical) VERNACULAR_ALIAS[variant] = canonical
   }
 
-  const banner = '// AUTO-GENERATED by scripts/sync_writeups.mjs — do not hand-edit.' 
+  const banner = '// AUTO-GENERATED by scripts/sync_writeups.mjs — do not hand-edit.\n\n'
   const out = banner +
     `export const TREE_WRITEUPS = ${JSON.stringify(TREE_WRITEUPS, null, 2)}\n\n` +
     `export const SPECIES_WRITEUPS = ${JSON.stringify(SPECIES_WRITEUPS, null, 2)}\n\n` +
