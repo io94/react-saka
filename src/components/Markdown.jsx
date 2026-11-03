@@ -9,10 +9,7 @@ const components = {
     }
     return <p className="text-bark-600 text-lg leading-relaxed mb-5">{children}</p>
   },
-  // Placement rides in the image title, set by the sync from the Doc:
-  //   "group"       → side-by-side (from a 1-row table of images)
-  //   "float-right" / "float-left" → text wraps around it (Docs "Wrap text")
-  //   (none)        → full-width block
+
   img({ src, alt, title }) {
     const t = title || ''
     const cls = t.includes('group')

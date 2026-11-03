@@ -2055,37 +2055,3 @@ export const allSitesLabel = formatSites(_allTrees)
 export function getTreeById(id) {
   return allTrees.find((t) => t.id === id) ?? null
 }
-
-// Curated tree-page write-ups, keyed by tree id. Same shape as SPECIES_META:
-//   body    — write-up text, transcribed from the source doc. Blank lines split paragraphs.
-//   figures — supporting images shown alongside the write-up, each with a caption.
-export const TREE_META = {
-  'BD.KU.TG.06A': {
-    body: `Located at the Pura Pemade Batan Kepuh, a 200-year-old kepuh tree towers over the pelinggih meru, the wooden, pagoda-like shrine of a Balinese temple. This temple honors the pangabih, the supernatural guardian whose duty is to guard the pura-pura in the Tandeg area. It is said that one of the sons of Peti Tenget was placed at this pura to guard and watch over the village. Within the tree also resides Ratu Biang Sakti, a female elder spiritual being whose form is a rangda, the figure of an old woman with a face like a Randa mask, both terrifying and respected in Balinese beliefs.
-
-Residents of Tandeg, and even those from outside, visit this pura to ask for children from the tree. This process of asking for descendants, also known as nunas sentana, involves a ceremony arranged by the kak mangku, who determines an auspicious day to pray to the tree. Sometimes the husband and wife stay overnight at this pura to practice ascetic meditation, or makemit. However, although the ceremony is necessary, it is ultimately up to the kepuh tree and the spiritual being within it whether to grant the wish. If the tree gives its blessing, then another tree will grow next to it, indicating that the wish has been granted.
-
-Apart from the ceremony to ask for children, there are also rituals for the Tumpek Bubuh odalan, the day of plants. During this ritual, the tree is decorated using flowers, kamen (which are traditional Balinese cloths wrapped around the waist, dropping from the navel down to the feet), and wastra poleng, a sacred black-and-white checkered cloth. The wastra poleng wrapped around the tree shows respect and marks the presence of a powerful spirit there. Offerings in the form of dapetan, a traditional offering made of a cone of steamed rice, are presented to the tree alongside fruits, sampian, canang, and panyeneng.
-
-Despite being 200 years old, this tree is not sustained by human care, but by the sacredness of the tree itself. As one of the interviewees states: “The tree grows by itself because of its sacredness and because of those who reside in it—if it is not destined to live, then it dries up and dies, but if it is a tree in the pura, then surely it will continue on. If it is the flowering season, it flowers; when it is the dry season, it becomes like this, shedding its leaves” (Paragraph 125).
-
-Moreover, because of its sacralized status, the tree does not face threats from external sources such as nature or construction, nor does it itself become one to others. Fearful of retribution from the tree, no one dares to cut down this kepuh tree. Furthermore, with a spirit guardian residing in the trees, no threat is presented to human safety, unless it is blessing humans between the wrongs and the rights. As the interviewee says, “If indeed we are wrong, there is this tree, a branch will fall from above and hit [someone]. It sheds and falls, but the way it falls, it will not hit anyone.”
-
-More broadly, the existence of the kepuh tree itself is what creates its sacredness and demands taksu, or a supreme, sacred energy granted by the divine. It is what creates the icon and sacredness of the pura itself, as showcased by its taking on the name of the tree: Pura Pemade Batan Kepuh. One can even say that without the kepuh tree, the pura’s taksu is diminished: “If there is a big tree there, niki, that becomes its icon. That becomes the basis for how people call that pura, the name of that pura’s location. As for this one, kan, its icon is this kepuh tree. From the beginning, since I was little, I already knew that people called it Pura Batan Kepuh” (Paragraph 224).
-
-The kepuh tree also serves important societal functions for the village. As one of the residents recalls, the tree has been a fixture in the community for generations and provided a necessary shelter for residents at a time when the entire village was comprised of rice fields, without any shade or a place of rest. In the mind of a resident, it is fondly remembered as a place for joking around and playing when he was young.`,
-    // afterParagraph — 0-based index of the paragraph a figure appears beside/after.
-    // group — figures sharing an id render side-by-side (e.g. the Google Earth series).
-    figures: [
-      { src: '/images/trees/BD.KU.TG.06A/fig-01-map.jpg', caption: 'Figure 1. Map of Pura Pemade Batan Kepuh.', afterParagraph: 0 },
-      { src: '/images/trees/BD.KU.TG.06A/fig-02-temple.jpg', caption: 'Figure 2. Pura Pemade Batan Kepuh.', afterParagraph: 2 },
-      { src: '/images/trees/BD.KU.TG.06A/fig-03-2002.png', caption: 'Figure 3. Google Earth image from October 17, 2002.', afterParagraph: 6, group: 'satellite' },
-      { src: '/images/trees/BD.KU.TG.06A/fig-04-2012.png', caption: 'Figure 4. Google Earth image from September 15, 2012.', afterParagraph: 6, group: 'satellite' },
-      { src: '/images/trees/BD.KU.TG.06A/fig-05-2025.png', caption: 'Figure 5. Google Earth image from May 2, 2025.', afterParagraph: 6, group: 'satellite' },
-    ],
-  },
-}
-
-export function getTreeMeta(id) {
-  return TREE_META[id] ?? null
-}

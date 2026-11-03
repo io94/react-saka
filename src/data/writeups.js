@@ -6,14 +6,10 @@ import {
   TEAM,
   RESOURCES,
 } from './writeups.generated.js'
-import { getTreeMeta } from './trees.js'
 
-// Tree page body
 export function getTreeWriteup(id) {
   const doc = TREE_WRITEUPS[id]
   if (doc?.body) return { body: doc.body, figures: [], isMarkdown: true }
-  const meta = getTreeMeta(id)
-  if (meta?.body) return { body: meta.body, figures: meta.figures || [], isMarkdown: false }
   return null
 }
 

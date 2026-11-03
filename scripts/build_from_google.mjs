@@ -115,7 +115,6 @@ async function main() {
   const sheet = await readSheet()
   const folders = await listTreeFolders()
   const folderByName = Object.fromEntries(folders.map((f) => [f.name, f.id]))
-  console.log(`Sheet rows: ${sheet.length}   Drive tree folders: ${folders.length}`)
 
   const manifest = loadManifest()
   fs.mkdirSync(IMG_ROOT, { recursive: true })
@@ -205,12 +204,6 @@ async function main() {
 
   const out = `// AUTO-GENERATED from Google Sheet + Drive by scripts/build_from_google.mjs\n// Do not hand-edit _allTrees; edit the Google Sheet instead.\nconst _allTrees = ${JSON.stringify(records, null, 2)}\n\n${tail}`
   fs.writeFileSync(TREES_JS, out)
-
-  console.log(`\n✅ Wrote ${records.length} trees to src/data/trees.js`)
-  console.log(
-    `   ${withPhotos} trees have photos — ${downloaded} downloaded, ${skipped} unchanged (skipped), ${pruned} removed`,
-  )
-  console.log(`   (backup saved next to trees.js; TREE_META narrative preserved)`)
 }
 
 main().catch((e) => {
