@@ -18,10 +18,10 @@ const components = {
         ? 'sm:float-right sm:w-2/5 sm:ml-6 mb-4'
         : t.includes('float-left')
           ? 'sm:float-left sm:w-2/5 sm:mr-6 mb-4'
-          : 'my-6'
+          : 'my-6 max-w-lg mx-auto'
     return (
       <figure className={`${cls} border border-sand-200 bg-sand-50`}>
-        <img src={src} alt={alt || ''} className="w-full object-contain bg-white" />
+        <img src={src} alt={alt || ''} className="w-full max-h-[75vh] object-contain bg-white" />
         {alt && (
           <figcaption className="text-bark-400 text-xs italic text-center leading-snug px-3 py-2 border-t border-sand-200">
             {alt}
