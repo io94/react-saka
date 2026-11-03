@@ -1,11 +1,5 @@
 import { allTrees } from './trees.js'
-import { SPECIES_WRITEUPS, VERNACULAR_ALIAS } from './writeups.generated.js'
-
-const slugify = (name) =>
-  name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
+import { SPECIES_WRITEUPS, VERNACULAR_ALIAS, SPECIES_SLUGS } from './writeups.generated.js'
 
 function deriveScientific(trees) {
   const counts = {}
@@ -31,7 +25,8 @@ function buildSpecies() {
 
   const list = []
   for (const [name, trees] of groups) {
-    const slug = slugify(name)
+    const slug = SPECIES_SLUGS[name]
+    if (!slug) continue
     const docBody = SPECIES_WRITEUPS[slug]?.body || null
     const heroFromTree = trees.find((t) => t.image)?.image || null
     list.push({

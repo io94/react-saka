@@ -29,3 +29,25 @@ export const VERNACULAR_ALIAS = {
   "Kepal/Kepel": "Kepel",
   "Rambutan Jantan": "Rambutan"
 }
+
+export const SPECIES_SLUGS = {
+  "Angsana": "angsana",
+  "Asam": "asam",
+  "Beringin": "beringin",
+  "Bingin dan Ketapang": "bingin-dan-ketapang",
+  "Bintawas": "bintawas",
+  "Bunut": "bunut",
+  "Camplung": "camplung",
+  "Cemara": "cemara",
+  "Kepah": "kepah",
+  "Kepel": "kepel",
+  "Kepuh": "kepuh",
+  "Kresek": "kresek",
+  "Kutuh": "kutuh",
+  "Kuwang": "kuwang",
+  "Mangga": "mangga",
+  "Pole": "pole",
+  "Rambutan": "rambutan",
+  "Randu Alas": "randu-alas",
+  "Suar": "suar"
+}
