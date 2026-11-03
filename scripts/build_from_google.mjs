@@ -15,6 +15,7 @@ const FOLDER_ID = '17fcu4dgpTR6ro6UVKD56gbHCOGJp0zJ4'
 
 const TREES_JS = path.join(APP, 'src', 'data', 'trees.js')
 const IMG_ROOT = path.join(APP, 'public', 'images', 'trees')
+const MANIFEST = path.join(__dirname, 'photo-sync-manifest.json')
 
 const auth = new google.auth.GoogleAuth({
   ...(process.env.GOOGLE_SERVICE_ACCOUNT_JSON
@@ -69,7 +70,7 @@ async function listTreeFolders() {
 async function listImages(folderId) {
   const res = await drive.files.list({
     q: `'${folderId}' in parents and mimeType contains 'image/' and trashed=false`,
-    fields: 'files(id,name)',
+    fields: 'files(id,name,md5Checksum,size)',
     pageSize: 200,
     orderBy: 'name',
   })
@@ -95,6 +96,18 @@ function loadExisting() {
   return { byId, tail, raw: src }
 }
 
+function loadManifest() {
+  try {
+    return JSON.parse(fs.readFileSync(MANIFEST, 'utf8'))
+  } catch {
+    return { version: 1, entries: {} }
+  }
+}
+
+function saveManifest(m) {
+  fs.writeFileSync(MANIFEST, JSON.stringify(m, null, 2) + '\n')
+}
+
 async function main() {
   const { byId, tail, raw } = loadExisting()
   fs.writeFileSync(TREES_JS.replace(/\.js$/, `.backup-${Date.now()}.js`), raw)
@@ -104,12 +117,14 @@ async function main() {
   const folderByName = Object.fromEntries(folders.map((f) => [f.name, f.id]))
   console.log(`Sheet rows: ${sheet.length}   Drive tree folders: ${folders.length}`)
 
-  fs.rmSync(IMG_ROOT, { recursive: true, force: true })
+  const manifest = loadManifest()
   fs.mkdirSync(IMG_ROOT, { recursive: true })
 
+  const desired = new Set() // "<tree-id>/<filename>" paths that should exist locally
   const records = []
   let withPhotos = 0,
-    downloaded = 0
+    downloaded = 0,
+    skipped = 0
   for (const row of sheet) {
     const id = row.id.trim()
     const prev = byId[id] || {}
@@ -121,10 +136,24 @@ async function main() {
         const dir = path.join(IMG_ROOT, id)
         fs.mkdirSync(dir, { recursive: true })
         for (const im of imgs) {
+          const rel = `${id}/${im.name}`
           const dest = path.join(dir, im.name)
-          await download(im.id, dest)
-          await optimizeImage(dest)
-          downloaded++
+          desired.add(rel)
+          const entry = manifest.entries[rel]
+          const unchanged =
+            entry && im.md5Checksum && entry.md5 === im.md5Checksum && fs.existsSync(dest)
+          if (unchanged) {
+            skipped++
+          } else {
+            await download(im.id, dest)
+            await optimizeImage(dest)
+            downloaded++
+          }
+          manifest.entries[rel] = {
+            driveId: im.id,
+            md5: im.md5Checksum ?? null,
+            size: Number(im.size) || null,
+          }
           images.push(`/images/trees/${id}/${im.name}`)
         }
         withPhotos++
@@ -156,11 +185,31 @@ async function main() {
     })
   }
 
+  // Remove local images no longer in Drive, drop emptied folders, sync manifest.
+  let pruned = 0
+  for (const treeDir of fs.readdirSync(IMG_ROOT)) {
+    const abs = path.join(IMG_ROOT, treeDir)
+    if (!fs.statSync(abs).isDirectory()) continue
+    for (const f of fs.readdirSync(abs)) {
+      if (!desired.has(`${treeDir}/${f}`)) {
+        fs.rmSync(path.join(abs, f), { force: true })
+        pruned++
+      }
+    }
+    if (fs.readdirSync(abs).length === 0) fs.rmdirSync(abs)
+  }
+  for (const rel of Object.keys(manifest.entries)) {
+    if (!desired.has(rel)) delete manifest.entries[rel]
+  }
+  saveManifest(manifest)
+
   const out = `// AUTO-GENERATED from Google Sheet + Drive by scripts/build_from_google.mjs\n// Do not hand-edit _allTrees; edit the Google Sheet instead.\nconst _allTrees = ${JSON.stringify(records, null, 2)}\n\n${tail}`
   fs.writeFileSync(TREES_JS, out)
 
   console.log(`\n✅ Wrote ${records.length} trees to src/data/trees.js`)
-  console.log(`   ${withPhotos} trees have photos, ${downloaded} images downloaded`)
+  console.log(
+    `   ${withPhotos} trees have photos — ${downloaded} downloaded, ${skipped} unchanged (skipped), ${pruned} removed`,
+  )
   console.log(`   (backup saved next to trees.js; TREE_META narrative preserved)`)
 }
 

@@ -25,6 +25,16 @@ jobs:
 
       - run: npm ci
 
+      - name: Cache synced photos
+        uses: actions/cache@v4
+        with:
+          path: |
+            public/images/trees
+            scripts/photo-sync-manifest.json
+          key: photo-sync-${{ github.run_id }}
+          restore-keys: |
+            photo-sync-
+
       - name: Sync data and photos from Google
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
