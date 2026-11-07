@@ -221,7 +221,7 @@ export default function TreeDetail() {
             <p className="text-bark-400 text-xs uppercase tracking-widest mb-3">Tags</p>
             <div className="flex flex-wrap gap-1.5">
               {tree.subjects.map((s) => (
-                <span key={s} className="tag-pill bg-forest-50 text-forest-700 border border-forest-200 text-xs">{s}</span>
+                <span key={s} className="tag-pill bg-white text-forest-800 border border-forest-100 text-xs">{s}</span>
               ))}
             </div>
           </div>
