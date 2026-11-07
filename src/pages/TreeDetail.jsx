@@ -235,7 +235,7 @@ export default function TreeDetail() {
             ) : (
               <img src={PLACEHOLDER} alt="Sacred Canopy" className="w-20 opacity-30" />
             )}
-            <div className="absolute top-2 left-2 bg-black/60 text-white text-xs font-mono px-2 py-0.5">2013</div>
+            <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-0.5">2013</div>
           </div>
           <div className="relative overflow-hidden bg-forest-900 aspect-[4/3] flex items-center justify-center">
             {tree.image_2025 ? (
@@ -243,7 +243,7 @@ export default function TreeDetail() {
             ) : (
               <img src={PLACEHOLDER} alt="Sacred Canopy" className="w-20 opacity-30" />
             )}
-            <div className="absolute top-2 left-2 bg-black/60 text-white text-xs font-mono px-2 py-0.5">2025</div>
+            <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-0.5">2025</div>
           </div>
           {/* Vid 1 placeholder */}
           {/* <div className="bg-bark-900 aspect-[4/3] flex items-center justify-center">
