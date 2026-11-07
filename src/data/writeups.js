@@ -1,10 +1,6 @@
 import {
   TREE_WRITEUPS,
   SPECIES_WRITEUPS,
-  TOPIC_WRITEUPS,
-  PAGE_WRITEUPS,
-  TEAM,
-  RESOURCES,
 } from './writeups.generated.js'
 
 export function getTreeWriteup(id) {
@@ -13,12 +9,4 @@ export function getTreeWriteup(id) {
   return null
 }
 
-export function getTopicWriteup(slug) {
-  return TOPIC_WRITEUPS[slug]?.body || null
-}
-
-export function getPageWriteup(key) {
-  return PAGE_WRITEUPS[key] || null
-}
-
-export { SPECIES_WRITEUPS, TEAM, RESOURCES }
+export { SPECIES_WRITEUPS, }

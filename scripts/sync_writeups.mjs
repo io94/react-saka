@@ -14,7 +14,7 @@ const KEY =
 const SHEET_ID = '1w-BNQ2QL8kDA5YDB-lcgRV_a5qzU0N97aONyR7-wi9s'
 
 const OUT_JS = path.join(APP, 'src', 'data', 'writeups.generated.js')
-const IMG_ROOT = path.join(APP, 'public', 'images', 'writeups') 
+const IMG_ROOT = path.join(APP, 'public', 'images', 'writeups')
 const IMG_URL_BASE = '/images/writeups'
 
 const auth = new google.auth.GoogleAuth({
@@ -293,51 +293,23 @@ async function main() {
   fs.mkdirSync(IMG_ROOT, { recursive: true })
 
   const trees = await readTab('Sheet1')
+  const species = await readTab('Species')
 
   const TREE_WRITEUPS = {}
   const SPECIES_WRITEUPS = {}
 
-  let count = 0
   for (const t of trees) {
     const id = String(t.id).trim()
     if (!id || !t.writeup_doc) continue
     const body = await docUrlToMarkdown(t.writeup_doc, 'trees', id)
-    if (body) { TREE_WRITEUPS[id] = { body }; count++ }
+    if (body) TREE_WRITEUPS[id] = { body }
   }
   for (const s of species) {
-    if (!s.slug || !s.doc_url) continue
-    const body = await docUrlToMarkdown(s.doc_url, 'species', String(s.slug).trim())
-    if (body) { SPECIES_WRITEUPS[String(s.slug).trim()] = { body }; count++ }
+    const slug = String(s.slug || '').trim()
+    if (!slug || !s.doc_url) continue
+    const body = await docUrlToMarkdown(s.doc_url, 'species', slug)
+    if (body) SPECIES_WRITEUPS[slug] = { body }
   }
-  for (const t of topics) {
-    if (!t.slug || !t.doc_url) continue
-    const body = await docUrlToMarkdown(t.doc_url, 'topics', String(t.slug).trim())
-    if (body) { TOPIC_WRITEUPS[String(t.slug).trim()] = { body }; count++ }
-  }
-  for (const p of pages) {
-    const key = String(p.page || '').trim()
-    if (!key || !p.doc_url) continue
-    const body = await docUrlToMarkdown(p.doc_url, 'pages', key)
-    if (body) { PAGE_WRITEUPS[key] = body; count++ }
-  }
-
-  const TEAM = teamRows
-    .filter((r) => String(r.name || '').trim())
-    .map((r) => ({
-      name: String(r.name).trim(),
-      role: String(r.role || '').trim(),
-      photo: String(r.photo || '').trim() || null,
-      bio: String(r.bio || '').trim(),
-    }))
-
-  const RESOURCES = resourceRows
-    .filter((r) => String(r.title || '').trim())
-    .map((r) => ({
-      title: String(r.title).trim(),
-      url: String(r.url || '').trim(),
-      description: String(r.description || '').trim(),
-    }))
-
 
   const SPECIES_SLUGS = {}
   for (const s of species) {
