@@ -2,6 +2,7 @@ import { useParams, Link, Navigate } from 'react-router-dom'
 import { getSpeciesBySlug } from '../data/species.js'
 import { formatSites } from '../data/trees.js'
 import Markdown from '../components/Markdown.jsx'
+import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 
 const PLACEHOLDER = '/saka-logo.svg'
 
@@ -43,9 +44,7 @@ export default function SpeciesDetail() {
       <div className="bg-sand-50 border-b border-sand-200 pt-24 pb-8 px-6">
         <div className="max-w-7xl mx-auto">
           <Link to="/species" className="text-bark-400 hover:text-forest-700 text-sm uppercase tracking-wider flex items-center gap-1.5 transition-colors mb-4">
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-            </svg>
+            <ArrowLeftIcon className="w-3.5 h-3.5" strokeWidth={2.5} />
             Species
           </Link>
           <h1 className="text-forest-800 text-5xl font-bold">{item.name}</h1>

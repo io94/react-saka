@@ -4,6 +4,7 @@ import { species } from '../data/species.js'
 import { allSitesLabel } from '../data/trees.js'
 import Pagination from '../components/Pagination.jsx'
 import { usePagination } from '../hooks/usePagination.js'
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 
 function SpeciesCard({ item }) {
   return (
@@ -70,9 +71,7 @@ export default function Species() {
       <div className="sticky top-16 z-30 bg-white border-b border-sand-200 shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-3 flex flex-wrap items-center gap-3">
           <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-bark-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-            </svg>
+            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-bark-400" strokeWidth={2} />
             <input
               type="text"
               value={search}

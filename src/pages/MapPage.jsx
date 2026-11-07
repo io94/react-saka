@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css'
 import { allTrees as trees, allSites } from '../data/trees.js'
 import { topics } from '../data/topics.js'
 import { useUnitSystem, formatMeasurement } from '../hooks/useUnitSystem.js'
+import { MagnifyingGlassIcon, Cog6ToothIcon, Bars3Icon, XMarkIcon, ArrowRightIcon } from '@heroicons/react/24/outline'
 
 const CENTER = [-8.629, 115.199]
 const DEFAULT_ZOOM = 14
@@ -169,9 +170,7 @@ export default function MapPage() {
 
   const searchInput = (
     <div className="relative">
-      <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-bark-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-      </svg>
+      <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-bark-400" strokeWidth={2} />
       <input
         type="text"
         value={search}
@@ -239,10 +238,7 @@ export default function MapPage() {
             aria-expanded={mobileSettingsOpen}
             className="flex items-center justify-center w-9 h-9 rounded-full bg-forest-900 text-sand-200 hover:text-white transition-colors"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
+            <Cog6ToothIcon className="w-4 h-4" strokeWidth={1.8} />
           </button>
           {mobileSettingsOpen && (
             <div className="absolute right-0 top-full mt-2 w-max bg-white rounded-xl shadow-xl border border-sand-200 p-3 flex flex-col gap-3 z-[1000]">
@@ -279,9 +275,7 @@ export default function MapPage() {
             onClick={() => setMobileListOpen(true)}
             className="sm:hidden absolute top-3 left-3 z-[600] flex items-center gap-1.5 px-3 py-2 rounded-full bg-white/95 shadow-lg text-forest-800 text-xs font-semibold hover:bg-white transition-colors"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-            </svg>
+            <Bars3Icon className="w-4 h-4" strokeWidth={2} />
             List
           </button>
 
@@ -304,9 +298,7 @@ export default function MapPage() {
                   className="absolute top-2 right-2 w-7 h-7 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors"
                   aria-label="Close"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <XMarkIcon className="w-3.5 h-3.5" strokeWidth={2.5} />
                 </button>
               </div>
 
@@ -351,12 +343,10 @@ export default function MapPage() {
 
                 <Link
                   to={`/tree/${selectedTree.id}`}
-                  className="mt-4 flex items-center justify-center gap-1.5 w-full py-2 bg-forest-700 hover:bg-forest-600 text-white text-xs font-semibold transition-colors"
+                  className="mt-4 flex items-center justify-center gap-1.5 w-full py-2 rounded-md bg-forest-700 hover:bg-forest-600 text-white text-xs font-semibold transition-colors"
                 >
                   View full record
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                  </svg>
+                  <ArrowRightIcon className="w-3.5 h-3.5" strokeWidth={2} />
                 </Link>
               </div>
             </div>
@@ -376,9 +366,7 @@ export default function MapPage() {
                   aria-label="Close list"
                   className="w-7 h-7 -mr-1 flex items-center justify-center text-bark-400 hover:text-bark-700"
                 >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <XMarkIcon className="w-4 h-4" strokeWidth={2} />
                 </button>
               </div>
               {searchInput}

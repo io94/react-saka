@@ -3,6 +3,7 @@ import { useParams, Link, Navigate } from 'react-router-dom'
 import { getTreeById } from '../data/trees.js'
 import { getTreeWriteup } from '../data/writeups.js'
 import { useUnitSystem, formatMeasurement } from '../hooks/useUnitSystem.js'
+import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import Markdown from '../components/Markdown.jsx'
 
 const PLACEHOLDER = '/saka-logo.svg'
@@ -135,9 +136,7 @@ export default function TreeDetail() {
       <div className="bg-sand-50 border-b border-sand-200 pt-24 pb-8 px-6">
         <div className="max-w-7xl mx-auto">
           <Link to="/trees" className="text-bark-400 hover:text-forest-700 text-sm uppercase tracking-wider flex items-center gap-1.5 transition-colors mb-4">
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-            </svg>
+            <ArrowLeftIcon className="w-3.5 h-3.5" strokeWidth={2.5} />
             Trees
           </Link>
           <h1 className="text-forest-800 text-5xl font-bold">{tree.title || tree.vernacular}</h1>
@@ -222,7 +221,7 @@ export default function TreeDetail() {
             <p className="text-bark-400 text-xs uppercase tracking-widest mb-3">Tags</p>
             <div className="flex flex-wrap gap-1.5">
               {tree.subjects.map((s) => (
-                <span key={s} className="tag-pill bg-forest-100 text-forest-700 border border-forest-200 text-xs">{s}</span>
+                <span key={s} className="tag-pill bg-forest-50 text-forest-700 border border-forest-200 text-xs">{s}</span>
               ))}
             </div>
           </div>
