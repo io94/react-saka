@@ -353,7 +353,7 @@ export default function MapPage() {
           )}
         </div>
       </div>
-
+       {/* Mobile */}
       {mobileListOpen && (
         <div className="sm:hidden fixed inset-0 z-[1200]">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileListOpen(false)} />
